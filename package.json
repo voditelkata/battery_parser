@@ -1,0 +1,30 @@
+{
+  "name": "battery_parser",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prettier": "npx prettier . --write",
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/voditelkata/battery_parser.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/voditelkata/battery_parser/issues"
+  },
+  "homepage": "https://github.com/voditelkata/battery_parser#readme",
+  "dependencies": {
+    "puppeteer": "^22.14.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "3.3.3"
+  }
+}
