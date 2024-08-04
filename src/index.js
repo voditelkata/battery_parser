@@ -1,6 +1,5 @@
-import { PageParser } from './PageParser.js';
 import { FileSaver } from './FileSaver.js';
-import {BrandParser} from "./BrandParser.js";
+import { BrandParser } from "./BrandParser.js";
 
 const url = 'https://bat.by/optovye-pokupateli';
 

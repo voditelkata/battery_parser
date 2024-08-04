@@ -32,14 +32,18 @@ export class BrandParser extends PageParser {
       const titles = [...titleElements].map(element =>
         element.textContent.replace(/[-]/gm, '').replace('цена', ' цена'),
       );
+      titles.push('link');
 
       const rowsElements = document.querySelectorAll('tbody > tr');
-      const rows = [...rowsElements].map(rowElement => {
-        const cells = rowElement.children;
-        return [...cells].map(cell => {
-          const text = cell.textContent;
-          return text.replace(/[\r\n]/gm, '').trim();
+      const rows =  [...rowsElements].map(rowElement => {
+        const cells = Array.from(rowElement.children);
+        const  result = cells.map((cell) => {
+          return cell.innerText.trim();
         });
+        const link = cells.at(0).querySelector('a');
+        result.push(link?.href);
+
+        return result;
       });
 
       return rows.map(row => {
@@ -54,11 +58,42 @@ export class BrandParser extends PageParser {
     });
   }
 
+  async getProductDetails() {
+    return await this.page.evaluate(() => {
+      const name = document.querySelector('h1')?.innerText?.trim();
+      const productCodeTitle =  Array.from(document.querySelectorAll('table tr strong'))?.find(el => el.innerText === 'Артикул');
+      const productCode = productCodeTitle?.parentNode?.parentElement?.nextElementSibling?.textContent;
+      return {
+        name,
+        productCode,
+      }
+    });
+  }
+
+  async parseProducts(items) {
+    const products = [];
+    for await (const item of items) {
+      await this.page.goto(item.link, { waitUntil: 'domcontentloaded' });
+      const product = await this.getProductDetails();
+      products.push(product);
+    }
+    return products
+  }
+
+  mapperProductWithDetailInfo(products, productsWithDetail) {
+    return products.map(({link, ...product}, index) => ({
+      ...product,
+      'Артикул': productsWithDetail[index].productCode,
+    }));
+  }
+
   async parse() {
     const result = [];
     for await (const brand of this.brands) {
-      const dataByBrand = await this.getDataByBrand(brand);
-      result.push(...dataByBrand);
+      const productsByBrand = await this.getDataByBrand(brand);
+      const productsDetailInfo = await this.parseProducts(productsByBrand);
+      const products = this.mapperProductWithDetailInfo(productsByBrand, productsDetailInfo);
+      result.push(...products);
     }
     return result;
   }
