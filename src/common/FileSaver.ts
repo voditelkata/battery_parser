@@ -1,7 +1,7 @@
 import * as XLSX from 'xlsx';
 
 export class FileSaver {
-  static createFile(fileName, data) {
+  static createFile(fileName: string, data: Array<any>) {
     const currentDate = new Date();
     const workSheet = XLSX.utils.json_to_sheet(data);
     const workBook = XLSX.utils.book_new();
