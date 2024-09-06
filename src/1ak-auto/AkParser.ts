@@ -36,10 +36,24 @@ export class AkParser {
   }
 
   private async getProductLinksByBrand(brand: string): Promise<string[] | undefined> {
-    await this.page.click('input[class="fsearch-complete"]');
-    await this.page.type('input[class="fsearch-complete"]', brand, { delay: 200 });
-    await this.page.keyboard.press('Enter');
-    await this.page.waitForNavigation();
+    const selectBrand = await this.page.evaluate((brand: string): string | undefined => {
+      const element = document.querySelector<HTMLSelectElement>('.menu-list select.click-filter-noload');
+      if (element) {
+        element.style.display = 'block';
+        const options = Array.from(element.options);
+        debugger;
+        const optionToSelect = options.find(item => item.text?.toLowerCase()?.includes(brand?.toLowerCase()));
+        return optionToSelect?.value;
+      }
+    }, brand);
+
+    if (selectBrand) {
+      await this.page.select('.menu-list select.click-filter-noload', selectBrand);
+      await this.page.click('input.is-submit');
+      await this.page.waitForNavigation();
+    } else {
+      return undefined;
+    }
 
     const selectValue = await this.page.evaluate((): string | undefined => {
       const maxValue = '96';
@@ -149,6 +163,8 @@ export class AkParser {
         const productsDetailInfo = await this.parseProducts(productLinks);
         const products = this.mapperProductWithDetailInfo(productsDetailInfo);
         result.push(...products);
+      } else {
+        console.log(`Brand ${brand} not found. Skipping...`);
       }
     }
     return result;
