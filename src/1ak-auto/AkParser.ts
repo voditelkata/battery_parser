@@ -142,8 +142,8 @@ export class AkParser {
 
   async parse(url: string, brands: Array<string>): Promise<any[]> {
     const result: any[] | PromiseLike<any[]> = [];
-    await this.page.goto(url, { waitUntil: 'domcontentloaded' });
     for await (const brand of brands) {
+      await this.page.goto(url, { waitUntil: 'domcontentloaded' });
       const productLinks = await this.getProductLinksByBrand(brand);
       if (productLinks) {
         const productsDetailInfo = await this.parseProducts(productLinks);
